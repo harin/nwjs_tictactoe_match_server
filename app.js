@@ -1,9 +1,9 @@
 "use strict";
-
+//match server
 var app = require('express')();
 var http = require('http').Server(app);
 var server_io = require('socket.io')(http);
-var firstTurn = {};
+
 
 $(document).ready(function(){
     var randomVal = Math.random()*10;
@@ -11,12 +11,10 @@ $(document).ready(function(){
     if(randomVal < 5){
         firstTurn.first = 'client';
         firstTurn.second = 'server';
-    }
-    else{
+    }else{
         firstTurn.first= 'server';
         firstTurn.second= 'client'
     }
-    console.log("first round= "+firstTurn);
 });
 
 app.get('/', function(req, res){
@@ -49,47 +47,35 @@ var User = function(ip, port, name, socket) {
 
 server_io.use(function (socket, next) {
   var handshake = socket.handshake;
-  console.log(handshake.query);
-  var query = handshakeData.query
+  console.log("handshake: "+ handshake.query);
+  var query = handshake.query
     if (query) {
-
         var user = new User(query.ip, query.port, query.name, socket);
         userList[socket.id] = user
-
         next();
     } else {
         console.log("No query found");
     }
-
 });
 
 server_io.on('connection', function(socket){
     console.log('a user connected');
-    console.log("User="+ userList[socket.id]);
-    var newUserLi = '<li>test</li>'
+
+    var user = userList[socket.id];
+    console.log("User="+ user);
+
+    var newUserLi = '<li id="'+socket.id+'">'+user.name+' | ' + user.ip+ ' | '+ user.port +'</li>';
 
     $("#userlist").append(newUserLi);
-
-    // server_io.emit('requestUserInfo');
-
-    // socket.on('userData', function(data){
-    //     var newUser = user();
-    //     newUser.ip = data.ip;
-    //     newUser.port = data.port;
-    //     newUser.name = data.name;
-    // });
-    server_io.emit('userList', userList);
-
-    //Update user list
-    //Broadcast user list
+    broadcastUserList()
 
     socket.on('disconnect', function(){
         //Update user list
-        $('#userList #someid').remove();
+        $('#' + socket.id ).remove();
         delete userList[socket.id]
 
         //Broadcast user list
-        server_io.emit('userList', userList);
+        broadcastUserList()
         console.log('user disconnected');
         // server_io.emit('noConnections', --noConnections);
     });
@@ -99,7 +85,16 @@ server_io.on('connection', function(socket){
         // console.log(data.starter+' will get to start');
         restart();
     });
-
-
 });
 
+
+var broadcastUserList = function() {
+    var list = Object.keys(userList).map(function(id){
+        return {
+            ip: userList[id].ip,
+            port: userList[id].port
+        }
+    });
+
+    server_io.emit('userList', list);
+}
