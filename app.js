@@ -34,11 +34,12 @@ var noConnections = function(){
     return userList.count;
 }
 
-var User = function(ip, port, name, socket) {
+var User = function(ip, port, name, socket, isServer) {
     this.ip = ip;
     this.port = port;
     this.name = name;
     this.socket = socket;
+    this.isServer = isServer;
 
 }
 /**************************************************** 
@@ -50,7 +51,7 @@ server_io.use(function (socket, next) {
   console.log("handshake: "+ handshake.query);
   var query = handshake.query
     if (query) {
-        var user = new User(query.ip, query.port, query.name, socket);
+        var user = new User(query.ip, query.port, query.name, socket, query.isServer);
         userList[socket.id] = user
         next();
     } else {
@@ -85,14 +86,32 @@ server_io.on('connection', function(socket){
         // console.log(data.starter+' will get to start');
         restart();
     });
+
+    socket.on('userdata', function(data){
+        var user = userList[socket.id];
+        if(data.name) user.name = data.name;
+        if(data.ip) user.ip = data.ip;
+        if(data.port) user.port = data.port;
+        if(data.isServer) user.isServer = data.isServer;
+
+        //update list ui 
+        $('#' + socket.id ).remove();
+        var newUserLi = '<li id="'+socket.id+'">'+user.name+' | ' + user.ip+ ' | '+ user.port +'</li>';
+
+        $("#userlist").append(newUserLi);
+
+        broadcastUserList();
+    })
 });
 
 
 var broadcastUserList = function() {
     var list = Object.keys(userList).map(function(id){
         return {
+            name: userList[id].name,
             ip: userList[id].ip,
-            port: userList[id].port
+            port: userList[id].port,
+            isServer: userList[id].isServer
         }
     });
 
