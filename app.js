@@ -23,46 +23,75 @@ app.get('/', function(req, res){
     res.sendFile(__dirname + '/index.html');
 });
 
+http.listen( 8765 , function(){
+    console.log('listening on *:' + 8765);
+});
+
 /**************************************************** 
                      Properties
 *****************************************************/
-
-
-var userList = {};
+var userList = [];
 // var lastTurn;
 var noConnections = function(){
     return userList.count;
 }
 
-class user {
-    var ip;
-    var port;
-    var name;
+var User = function(ip, port, name, socket) {
+    this.ip = ip;
+    this.port = port;
+    this.name = name;
+    this.socket = socket;
+
 }
-
-var serverScore = 0;
-var clientScore = 0;
-var winner = "";
-
 /**************************************************** 
                      Methods
 *****************************************************/
 
+server_io.use(function (socket, next) {
+  var handshake = socket.handshake;
+  console.log(handshake.query);
+  var query = handshakeData.query
+    if (query) {
+
+        var user = new User(query.ip, query.port, query.name, socket);
+        userList[socket.id] = user
+
+        next();
+    } else {
+        console.log("No query found");
+    }
+
+});
 
 server_io.on('connection', function(socket){
     console.log('a user connected');
+    console.log("User="+ userList[socket.id]);
+    var newUserLi = '<li>test</li>'
+
+    $("#userlist").append(newUserLi);
+
+    // server_io.emit('requestUserInfo');
+
+    // socket.on('userData', function(data){
+    //     var newUser = user();
+    //     newUser.ip = data.ip;
+    //     newUser.port = data.port;
+    //     newUser.name = data.name;
+    // });
+    server_io.emit('userList', userList);
+
     //Update user list
-
     //Broadcast user list
-    server_io.emit('serverName', serverName);
-
 
     socket.on('disconnect', function(){
         //Update user list
+        $('#userList #someid').remove();
+        delete userList[socket.id]
 
         //Broadcast user list
+        server_io.emit('userList', userList);
         console.log('user disconnected');
-        server_io.emit('noConnections', --noConnections);
+        // server_io.emit('noConnections', --noConnections);
     });
 
     socket.on('restart', function(data){
@@ -71,13 +100,6 @@ server_io.on('connection', function(socket){
         restart();
     });
 
-    socket.on('resetBoard', function(data){
-        resetBoard();
-    });
-
-    // socket.on('restart', function(){
-    //     restart();
-    // });
 
 });
 

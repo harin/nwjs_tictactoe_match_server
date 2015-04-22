@@ -11,99 +11,13 @@
     </head>
 
 
-    <body onload="window.resizeTo(1100,800)">
-        <div id="main-display">
-
-            <header>
-                <form class="form-inline" action="" id="setupForm">
-
-                    <div class="form-group">
-                        <label for="name">Name:</label>
-                        <input class="form-control" type="text" id="name" />        
-                    </div>
-
-                    <div class="form-group">
-                        <label for="ipAddress">IP Address:</label>
-                        <input class="form-control" type="text" id="ipAddress" value="localhost" />        
-                    </div>
-
-                    <div class="form-group">
-                        <label for="port">Port:</label>
-                        <input class="form-control" type="text" id="port" value="4343"/>  
-                    </div>
-
-                    <div class="form-group">
-                        <select id="role" class="form-control">
-                            <option value="server">Server</option>
-                            <option value="client">Client</option>
-                        </select>        
-                    </div>
-
-
-                    <div class="form-group">
-                        <button class="btn btn-primary" id="start-stop-btn" type="submit">Start</button>
-                        <button type="button" class="btn btn-danger" name="restart" id="restart-btn">Restart Game</button>
-                    </div>
-                </form>
-                <div id="setting">
-                    <label>Theme:</label><select id="change-theme-select">Theme
-                        <option id="bg1" >bg1</option>
-                        <option id="bg2" >bg2</option>
-                        <option id="bg3" selected>bg3</option>
-                        <option id="bg4" >bg4</option>
-                        <option id="bg5" >bg5</option>
-                    </select>
-                </div>
-            </header>
-
-            <main> 
-                <div class="col-md-3" id="scoreboard">
-                    <div id="serverBoard" >
-                        <label id="serverScore">0</label><br>
-                        <label id="serverScoreLabel">Server</label> 
-                    </div>
-
-                    <div id="clientBoard">
-                        <label id="clientScore">0</label><br>
-                        <label id="clientScoreLabel">Client</label> 
-                    </div>
-                </div>
-
-
-                <table id="tictactoe" class="col-md-3">
-                    <tr id="row0" data-row="0" class="tictactoe-row">
-                        <td class="xo" id="col0" data-col="0"><i></i></td>
-                        <td class="xo" id="col1" data-col="1"><i></i></td>
-                        <td class="xo" id="col2" data-col="2"><i></i></td>
-                    </tr>
-                    <tr id="row1" data-row="1" class="tictactoe-row">
-                        <td class="xo" id="col0" data-col="0"><i></i></td>
-                        <td class="xo" id="col1" data-col="1"><i></i></td>
-                        <td class="xo" id="col2" data-col="2"><i></i></td>
-                    </tr>
-                    <tr id="row2" data-row="2" class="tictactoe-row">
-                        <td class="xo" id="col0" data-col="0"><i></i></td>
-                        <td class="xo" id="col1" data-col="1"><i></i></td>
-                        <td class="xo" id="col2" data-col="2"><i></i></td>
-                    </tr>
-                </table>
-            </main>
-
-        </div>
-
-        <!--CHAT!-->
-        <div class="col-md-3" id="chat-sidecart">
-            <p id="chatbox-title">Chat</p>
-            <ul id="chat-msgbox">
-            </ul>
-            <form action="" id="chat-input">
-                <input id="m" autocomplete="off" type="text" />
-                <button id="send">Send</button>
-            </form>
-        </div>
-
-
+    <body>
+        <ul id="userlist">
+            
+        </ul>
     </body>
+
+
     <script type="text/javascript" src="public/js/bootstrap.min.js"></script>
     <script src="public/js/socket.io.js"></script>
     <script type="text/javascript" src="app.js"></script>
