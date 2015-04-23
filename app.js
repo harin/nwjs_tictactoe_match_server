@@ -93,14 +93,16 @@ server_io.on('connection', function(socket){
         //Add new data
         var user = userList[socket.id];
 
-        var newUserLi = '<li id="'+socket.id+'">'+user.name+' | ' + user.ip+ ' | '+ user.port ;
 
         if(data.name) user.name = data.name;
         if(data.ip) user.ip = data.ip;
         if(data.port) user.port = data.port;
+        var newUserLi = '<li id="'+socket.id+'">'+user.name+' | ' + user.ip+ ' | '+ user.port ;
+        
+        
         if(data.isServer) {
             user.isServer = data.isServer;
-            newUserLi += '<button class="restartGame" data-id='+socket.id+'>Restart Game</button>'
+            newUserLi += '<button class="btn btn-danger restartGame" data-id='+socket.id+'>Restart Game</button>'
         }
 
         newUserLi += '</li>';
