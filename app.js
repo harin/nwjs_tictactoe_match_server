@@ -40,7 +40,7 @@ var User = function(ip, port, name, socket, isServer) {
     this.name = name;
     this.socket = socket;
     this.isServer = isServer;
-
+    this.gameStarted = undefined;
 }
 /**************************************************** 
                      Methods
@@ -88,30 +88,51 @@ server_io.on('connection', function(socket){
     });
 
     socket.on('userdata', function(data){
+        //remove old data
+        $('#' + socket.id ).remove();
+        //Add new data
         var user = userList[socket.id];
+
+        var newUserLi = '<li id="'+socket.id+'">'+user.name+' | ' + user.ip+ ' | '+ user.port ;
+
         if(data.name) user.name = data.name;
         if(data.ip) user.ip = data.ip;
         if(data.port) user.port = data.port;
-        if(data.isServer) user.isServer = data.isServer;
+        if(data.isServer) {
+            user.isServer = data.isServer;
+            newUserLi += '<button class="restartGame" data-id='+socket.id+'>Restart Game</button>'
+        }
 
-        //update list ui 
-        $('#' + socket.id ).remove();
-        var newUserLi = '<li id="'+socket.id+'">'+user.name+' | ' + user.ip+ ' | '+ user.port +'</li>';
-
+        newUserLi += '</li>';
         $("#userlist").append(newUserLi);
-
+        $('button.restartGame').on('click', function(event){
+            var id = $(event.target).data('id');
+            console.log("restarting game for "+id);
+            userList[id].socket.emit('restart');
+        })
         broadcastUserList();
-    })
+
+
+    });
+
+    socket.on('gameStarted', function(data){
+        userList[socket.id].gameStarted = data;
+        broadcastUserList();
+    });
+
 });
 
 
 var broadcastUserList = function() {
+    $('#noUser').html(Object.keys(userList).length);
+
     var list = Object.keys(userList).map(function(id){
         return {
             name: userList[id].name,
             ip: userList[id].ip,
             port: userList[id].port,
-            isServer: userList[id].isServer
+            isServer: userList[id].isServer,
+            gameStarted: userList[id].gameStarted
         }
     });
 
