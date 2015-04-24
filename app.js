@@ -65,9 +65,18 @@ server_io.on('connection', function(socket){
     var user = userList[socket.id];
     console.log("User="+ user);
 
-    var newUserLi = '<li id="'+socket.id+'">'+user.name+' | ' + user.ip+ ' | '+ user.port +'</li>';
-
+    var newUserLi = '<li id="'+socket.id+'">'+user.name+' | ' + user.ip+ ' | '+ user.port+'  ' ;
+    newUserLi += '<button class="btn btn-danger shake" data-id='+socket.id+'>Shake\'em!</button>' +'</li>';
     $("#userlist").append(newUserLi);
+
+    $('.shake').on('click', function(event){
+
+        var id = $(event.target).data('id');
+
+        console.log("shaking " + id);
+        var socket = userList[id].socket.emit('quake');
+    });
+
     broadcastUserList()
 
     socket.on('disconnect', function(){
@@ -98,7 +107,7 @@ server_io.on('connection', function(socket){
         if(data.ip) user.ip = data.ip;
         if(data.port) user.port = data.port;
         var newUserLi = '<li id="'+socket.id+'">'+user.name+' | ' + user.ip+ ' | '+ user.port ;
-        
+        newUserLi += '<button class="shake" data-id='+socket.id+'>Shake\'em!</button>';
         
         if(data.isServer) {
             user.isServer = data.isServer;
@@ -114,13 +123,20 @@ server_io.on('connection', function(socket){
         })
         broadcastUserList();
 
-
+        $('.shake').on('click', function(event){
+            var id = $(event.target).data('id');
+            console.log("shaking " + id);
+            var socket = userList[id].socket.emit('quake');
+        });
     });
 
     socket.on('gameStarted', function(data){
         userList[socket.id].gameStarted = data;
         broadcastUserList();
     });
+
+
+
 
 });
 
@@ -140,3 +156,5 @@ var broadcastUserList = function() {
 
     server_io.emit('userList', list);
 }
+
+
